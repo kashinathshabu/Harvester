@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: snmpd-config
-  namespace: snmp
+  namespace: monitoring
 data:
   snmpd.conf: |
     # Listen on all interfaces
