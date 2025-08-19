@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: snmpd
+  namespace: snmp
+spec:
+  selector:
+    matchLabels:
+      app: snmpd
+  template:
+    metadata:
+      labels:
+        app: snmpd
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+      - name: snmpd
+        image: polinux/snmpd:latest
+        securityContext:
+          privileged: true
+        ports:
+        - containerPort: 161
+          hostPort: 161
+          protocol: UDP
+        volumeMounts:
+        - name: snmpd-config
+          mountPath: /etc/snmp
+        - name: host-proc
+          mountPath: /proc
+          readOnly: true
+        - name: host-sys
+          mountPath: /sys
+          readOnly: true
+        - name: host-root
+          mountPath: /host
+          readOnly: true
+      volumes:
+      - name: snmpd-config
+        configMap:
+          name: snmpd-config
+      - name: host-proc
+        hostPath:
+          path: /proc
+      - name: host-sys
+        hostPath:
+          path: /sys
+      - name: host-root
+        hostPath:
+          path: /
+      tolerations:
+      - operator: Exists
